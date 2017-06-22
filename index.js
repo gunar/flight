@@ -53,7 +53,8 @@ const getItinerary = segments => {
 
 const parseCost = x => Number(x.substr(3))
 
-const queue = new Queue(1)
+const CONCURRENCY = 2
+const queue = new Queue(CONCURRENCY)
 
 const requestQueued = (...args) =>
   queue.add(request.bind(undefined, ...args))
@@ -111,6 +112,7 @@ const destinations = [
   'VRN',
   'CDG',
   'ORY',
+  'AMS',
 ]
 
 const endDates = [
