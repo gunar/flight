@@ -59,7 +59,7 @@ const requestQueued = (...args) =>
   queue.add(request.bind(undefined, ...args))
 
 const request = async ({ origin, destination, startDate, endDate }) => {
-  console.log({startDate, endDate})
+  console.log({startDate, endDate, destination})
   const key = process.env.API_KEY
   const fields = 'trips(tripOption/saleTotal,tripOption/slice,tripOption/pricing)'
   const url = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${key}&fields=${fields}`
@@ -107,7 +107,12 @@ const startDates = [
   '2017-11-8', 
 ]
 const origin = 'GRU'
-const destination = 'VRN'
+const destinations = [
+  'VRN',
+  'CDG',
+  'ORY',
+]
+
 const endDates = [
   '2018-01-28',
   '2018-01-29',
@@ -117,11 +122,13 @@ const endDates = [
 
 ;(async () => {
   const options = await Promise.all(
-    flatMap(startDate =>
-      map(endDate =>
-        requestQueued({ origin, destination, startDate, endDate })
-      )(endDates)
-    )(startDates)
+    flatMap(destination => 
+      flatMap(startDate =>
+        map(endDate =>
+          requestQueued({ origin, destination, startDate, endDate })
+        )(endDates)
+      )(startDates)
+    )(destinations)
   )
   const cheapest = options.reduce(
     (acc, next) =>
