@@ -53,7 +53,7 @@ const getItinerary = segments => {
 
 const parseCost = x => Number(x.substr(3))
 
-const CONCURRENCY = 2
+const CONCURRENCY = 3
 const queue = new Queue(CONCURRENCY)
 
 const requestQueued = (...args) =>
@@ -109,10 +109,13 @@ const startDates = [
 ]
 const origin = 'GRU'
 const destinations = [
-  'VRN',
-  'CDG',
-  'ORY',
-  'AMS',
+  'VRN', // Verona, Italy
+  'MIL', // Milan, Italy
+  'CDG', // Paris, France
+  'ORY', // Paris, France
+  'AMS', // Amsterdan, Holland
+  'HAM', // Hamburg, Germany
+  'LIS', // Lisbon, Portugal
 ]
 
 const endDates = [
