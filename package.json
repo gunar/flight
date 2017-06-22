@@ -12,7 +12,9 @@
     "dotenv": "^4.0.0",
     "eslint": "^3.19.0",
     "jsonfui": "^1.2.6",
-    "node-fetch": "^1.7.1"
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.1",
+    "promise-queue": "^2.2.3"
   },
   "devDependencies": {},
   "description": ""

@@ -2,7 +2,12 @@
 
 require('dotenv').config() // load .env
 const fetch = require('node-fetch')
+const Queue = require('promise-queue')
 const { oneLine } = require('common-tags')
+const {
+  flatMap,
+  map,
+} = require('lodash/fp')
 
 const makeRequest = ({ origin, destination, startDate, endDate }) =>
   JSON.stringify({
@@ -48,7 +53,13 @@ const getItinerary = segments => {
 
 const parseCost = x => Number(x.substr(3))
 
+const queue = new Queue(1)
+
+const requestQueued = (...args) =>
+  queue.add(request.bind(undefined, ...args))
+
 const request = async ({ origin, destination, startDate, endDate }) => {
+  console.log({startDate, endDate})
   const key = process.env.API_KEY
   const fields = 'trips(tripOption/saleTotal,tripOption/slice,tripOption/pricing)'
   const url = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${key}&fields=${fields}`
@@ -88,21 +99,30 @@ const request = async ({ origin, destination, startDate, endDate }) => {
 }
 
 const startDates = [
-  '2017-10-31', 
-  '2017-11-1', 
-  '2017-11-2', 
   '2017-11-3', 
   '2017-11-4', 
   '2017-11-5', 
   '2017-11-6', 
+  '2017-11-7', 
+  '2017-11-8', 
 ]
 const origin = 'GRU'
 const destination = 'VRN'
-const endDate = '2018-02-22'
+const endDates = [
+  '2018-01-28',
+  '2018-01-29',
+  '2018-01-30',
+  '2018-01-31',
+]
 
 ;(async () => {
-  const options = await Promise.all(startDates.map(startDate =>
-    request({ origin, destination, startDate, endDate })))
+  const options = await Promise.all(
+    flatMap(startDate =>
+      map(endDate =>
+        requestQueued({ origin, destination, startDate, endDate })
+      )(endDates)
+    )(startDates)
+  )
   const cheapest = options.reduce(
     (acc, next) =>
       next.cost < acc.cost
